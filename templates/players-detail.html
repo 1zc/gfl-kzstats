@@ -1,0 +1,100 @@
+<!-- Player information -->
+<div class='playerinfo' ng-show='p'>
+  <!-- Loading spinner -->
+  <div class="spinner" ng-hide='steamInfo.avatarfull || steamError'>
+    <div class="spinner-container container1">
+      <div class="circle1"></div>
+      <div class="circle2"></div>
+      <div class="circle3"></div>
+      <div class="circle4"></div>
+    </div>
+    <div class="spinner-container container2">
+      <div class="circle1"></div>
+      <div class="circle2"></div>
+      <div class="circle3"></div>
+      <div class="circle4"></div>
+    </div>
+    <div class="spinner-container container3">
+      <div class="circle1"></div>
+      <div class="circle2"></div>
+      <div class="circle3"></div>
+      <div class="circle4"></div>
+    </div>
+  </div>
+  <a href='{{ steamInfo.profileurl }}' target='_blank'>
+    <img ng-src='{{ steamInfo.avatarfull }}' class='avatar' ng-show='steamInfo' alt='{{ p.name }}'>
+  </a>
+  <h1>
+    {{ p.name|emptyCheck }} 
+    <img src='{{ p.countrycode | imgPath }}' class='flagico' alt='{{ p.countrycode }}'>
+  </h1>
+  <h3>{{ p.rank }} [{{ p.points }} points]</h3>
+  <i>Last seen: {{ p.lastseen }}</i><br>
+  <a href='{{ steamInfo.profileurl }}' ng-show='steamInfo.profileurl'>Steam profile</a>
+</div>
+
+<div ng-show='p'>
+  <!-- Jumpstats -->
+  <div class='stats'>
+    <h2>Jumpstats</h2>
+    <span ng-show='p.jump.ljrecord > 0'>Longjump: <a ui-sref='jumps.detail({jumpName: "lj"})'>{{ p.jump.ljrecord }}</a></span>
+    <span ng-show='p.jump.bhoprecord > 0'>Bunnyhop: <a ui-sref='jumps.detail({jumpName: "bhop"})'>{{ p.jump.bhoprecord }}</a></span>
+    <span ng-show='p.jump.dropbhoprecord > 0'>Drop-bunnyhop: <a ui-sref='jumps.detail({jumpName: "dropbhop"})'>{{ p.jump.dropbhoprecord }}</a></span>
+    <span ng-show='p.jump.multibhoprecord > 0'>Multi-bunnyhop: <a ui-sref='jumps.detail({jumpName: "mbhop"})'>{{ p.jump.multibhoprecord }}</a></span>
+    <span ng-show='p.jump.wjrecord > 0'>Weirdjump: <a ui-sref='jumps.detail({jumpName: "wj"})'>{{ p.jump.wjrecord }}</a></span>
+    <span ng-show='p.jump.ladderjumprecord > 0'>Ladderjump: <a ui-sref='jumps.detail({jumpName: "ladderjump"})'>{{ p.jump.ladderjumprecord }}</a></span>
+    <span ng-show='p.jump.cjrecord > 0'>Countjump: <a ui-sref='jumps.detail({jumpName: "cj"})'>{{ p.jump.cjrecord }}</a></span>
+    <span ng-hide='p.jump'>Player hasn't performed any jumps.</span>
+  </div>
+
+  <!-- Run counts & progressbars -->
+  <div class='stats'>
+    <h2>Runs</h2>
+    TP times: {{ tprecords.length }} / {{ tpMapCount }} <progressbar value='tprecords.length' max='tpMapCount' ng-if='tpMapCount'></progressbar>
+    Pro times: {{ prorecords.length }} / {{ proMapCount }} <progressbar value='prorecords.length' max='proMapCount' ng-if='proMapCount'></progressbar>
+  </div>
+
+  <!-- Records -->
+  <div class='col-md-12'>
+    <h2 style='margin-bottom: 15px;'>Records</h2>
+    Filter: <input type='text' ng-model='searchField' style='margin-right: 10px;'>
+    Runtype: <select ng-model='showType' ng-options='type.name for type in types' ng-change='reloadResults()'></select><br>
+    <table class='table table-striped' style='max-width: 700px; margin-top: 20px;' ng-show='records'>
+      <tr>
+        <th>Map</th>
+        <th ng-show='showType.value !== "pro"'>Time</th>
+        <th ng-show='showType.value !== "pro"'>TPs</th>
+        <th ng-show='showType.value !== "tp"'>Pro time</th>
+      </tr>
+      <tr ng-repeat='r in filtered = (records | filter: searchField | startFrom: (currentPage-1)*pageSize | limitTo: pageSize)'>
+        <td><a ui-sref='maps.detail({mapName: r.mapname })'>{{ r.mapname }}</a></td>
+        <td ng-show='showType.value !== "pro"'>
+          <span ng-show='r.teleports > 0'>{{ r.runtime | convertTime }}</span>
+          <span ng-show='r.teleports < 0'>-</span>
+        </td>
+        <td ng-show='showType.value !== "pro"'>
+          <span ng-show='r.teleports > 0'>{{ r.teleports }}</span>
+          <span ng-show='r.teleports < 0'>-</span>
+        </td>
+        <td ng-show='showType.value !== "tp"'>
+          <span ng-show='r.runtimepro > 0'>{{ r.runtimepro | convertTime }}</span>
+          <span ng-show='r.runtimepro < 0'>-</span>
+        </td>
+      </tr>
+      <tr ng-hide='filtered.length > 0'>
+        <td>No records found.</td>
+        <td> </td>
+        <td ng-show='showType.value != "pro"'> </td>
+        <td ng-show='showType.value == "both"'> </td>
+      </tr>
+    </table>
+    <pagination total-items='records.length' max-size='5' ng-model='currentPage' items-per-page='pageSize' ng-show='records.length > pageSize && !searchField'></pagination>
+    <br><span ng-show='!records && loaded'>No runs available.</span>
+  </div>
+</div>
+
+<!-- Error msg -->
+<div ng-show='!p && loaded'>
+  <h1>Error - 404</h1>
+  Requested player was not found.
+</div>

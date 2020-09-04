@@ -1,0 +1,43 @@
+<!-- Map detail -->
+<h1 ng-show='records.tp.length > 0 || records.pro.length > 0'><a ui-sref='maps.list'>Maps</a> &raquo; {{ mapname }}</h1>
+
+<!-- TP -->
+<div class='col-md-4' style='margin-right: 45px;' ng-show='records.tp.length > 0'>
+  <h2>TP times <small>Top 50</small></h2>
+  <table class='table table-striped'>
+    <tr>
+      <th>#</th>
+      <th>Player</th>
+      <th>Time</th>
+      <th>TPs</th>
+    </tr>
+    <tr ng-repeat='r in records.tp | orderBy:"runtime"'>
+      <td>{{ $index + 1 }}.</td>
+      <td><a ui-sref='players.detail({ steamId: (r.steamid|numOnly) })'>{{ r.name|emptyCheck }}</a></td>
+      <td>{{ r.runtime | convertTime }}</td>
+      <td>{{ r.teleports }}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Pro -->
+<div class='col-md-4' ng-show='records.pro.length > 0'>
+  <h2>Pro times <small>Top 50</small></h2>
+  <table class='table table-striped'>
+    <tr>
+      <th>#</th>
+      <th>Player</th>
+      <th>Time</th>
+    </tr>
+    <tr ng-repeat='r in records.pro | orderBy:"runtime"'>
+      <td>{{ $index + 1 }}.</td>
+      <td><a ui-sref='players.detail({ steamId: (r.steamid|numOnly) })'>{{ r.name|emptyCheck }}</a></td>
+      <td>{{ r.runtime | convertTime }}</td>
+    </tr>
+  </table>
+</div>
+
+<div ng-hide='records.tp.length + records.pro.length > 0 || !loaded'>
+  <h1>Error - 404</h1>
+  Requested map was not found or does not have any records yet.</span>
+</div>

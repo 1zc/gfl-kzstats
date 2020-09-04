@@ -1,0 +1,18 @@
+<h1>Players <small>Top 50</small></h1>
+<div class='col-md-4'>
+  <table class='table table-striped' ng-show='players.length > 0'>
+    <tr>
+      <th>#</th>
+      <th>Player</th>
+      <th>Points</th>
+    </tr>
+    <tr ng-repeat='p in players'>
+      <td>{{ $index + 1 }}.</td>
+      <td>
+        <a ui-sref='players.detail({steamId: (p.steamid|numOnly)})'>{{ p.name|emptyCheck }}</a> 
+        <img class='flagico' ng-src='{{ p.countrycode | imgPath }}'>
+      </td>
+      <td>{{ p.points }}</td>
+    </tr>
+  </table>
+</div>

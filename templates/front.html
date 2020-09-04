@@ -1,0 +1,34 @@
+<div ng-show='server.name'>
+  <h1>{{ server.name }}</h1>
+  Welcome to the stats page of {{ server.name }}.<br>
+  Server IP: {{ server.ip }}
+</div>
+
+<h1 ng-hide='server.name'>KZStats Local</h1>
+
+<div class='panel panel-default latest'>
+  <div class='panel-heading'>
+    <h3>Latest records</h3>
+  </div>
+  <div class='panel-body'>
+    <div>
+      <div class='latest__entry' ng-repeat='r in records | orderBy:"-timestamp" | startFrom: startPoint | limitTo: pageSize'>
+        <h4>
+          <span class='tag tp' ng-show='r.teleports > 0'>TP</span>
+          <span class='tag pro' ng-show='r.teleports == 0'>Pro</span>
+          <a ui-sref='maps.detail({mapName: r.map})'>{{ r.map }}</a> 
+          <small> - {{ r.runtime | convertTime }}</small>
+        </h4>
+        Runner: <b><a ui-sref='players.detail({steamId: (r.steamid|numOnly)})'>{{ r.name|emptyCheck }}</a></b><br>
+        Date: {{ r.date }}
+      </div>
+    </div>
+    <div class='latest__entry' style='border: 0;' ng-hide='records.length > 0'>
+      No latest records available.
+    </div>
+    <div class='latest__footer' ng-show='records.length > pageSize'>
+      <button class='btn btn-default arrow' ng-click='showPrev()' ng-disabled='startPoint < 5'>&larr;</button>
+      <button class='btn btn-default arrow' ng-click='showNext()' ng-disabled='startPoint > 9'>&rarr;</button>
+    </div>
+  </div>
+</div>

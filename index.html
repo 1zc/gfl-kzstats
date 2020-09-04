@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html ng-app='kzApp'>
+  <head>
+    <!-- Meta -->
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <!-- Stylesheets & fonts -->
+    <link rel='stylesheet' type='text/css' href='css/bootstrap.min.css'>
+    <link rel='stylesheet' type='text/css' href='css/bundle.css'>
+    <link rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css?family=Oxygen'>
+    <link rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css?family=Titillium+Web:400,700&subset=latin,latin-ext'>
+    <!-- Favicons -->
+    <link rel='apple-touch-icon' sizes='57x57' href='img/favicon/apple-touch-icon-57x57.png'>
+    <link rel='apple-touch-icon' sizes='60x60' href='img/favicon/apple-touch-icon-60x60.png'>
+    <link rel='apple-touch-icon' sizes='72x72' href='img/favicon/apple-touch-icon-72x72.png'>
+    <link rel='apple-touch-icon' sizes='76x76' href='img/favicon/apple-touch-icon-76x76.png'>
+    <link rel='apple-touch-icon' sizes='114x114' href='img/favicon/apple-touch-icon-114x114.png'>
+    <link rel='apple-touch-icon' sizes='120x120' href='img/favicon/apple-touch-icon-120x120.png'>
+    <link rel='apple-touch-icon' sizes='144x144' href='img/favicon/apple-touch-icon-144x144.png'>
+    <link rel='apple-touch-icon' sizes='152x152' href='img/favicon/apple-touch-icon-152x152.png'>
+    <link rel='apple-touch-icon' sizes='180x180' href='img/favicon/apple-touch-icon-180x180.png'>
+    <link rel='icon' type='image/png' href='img/favicon/favicon-32x32.png' sizes='32x32'>
+    <link rel='icon' type='image/png' href='img/favicon/android-chrome-192x192.png' sizes='192x192'>
+    <link rel='icon' type='image/png' href='img/favicon/favicon-96x96.png' sizes='96x96'>
+    <link rel='icon' type='image/png' href='img/favicon/favicon-16x16.png' sizes='16x16'>
+    <link rel='manifest' href='img/favicon/manifest.json'>
+    <link rel='shortcut icon' href='img/favicon/favicon.ico'>
+    <meta name='msapplication-TileColor' content='#da532c'>
+    <meta name='msapplication-TileImage' content='img/favicon/mstile-144x144.png'>
+    <meta name='msapplication-config' content='img/favicon/browserconfig.xml'>
+    <meta name='theme-color' content='#ffffff'>
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <title>KZStats Local</title>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class='navbar' ng-controller='NavCtrl'>
+      <!-- Server info -->
+      <div class='navbar__server' ng-show='server.name'>
+        <b>{{ server.name }}</b>
+        <span ng-show='server.map'>Map: <a ui-sref='maps.detail({mapName: server.map })'>{{ server.map | stripWorkshop }}</a></span>
+        <span ng-show='server.map'>Players: {{ server.players }}/{{ server.maxplayers }}</span>
+        <span>IP: {{ server.ip }}</span>
+        <span ng-show='!server.map'>Server data unavailable</span>
+        <button class='btn btn-success' ng-click='joinServer(server.ip)'>Connect</button>
+      </div>
+      <!-- Main navigation menu -->
+      <ul class='navbar__menu'>
+        <li ui-sref-active='navActive'><a ui-sref='front'>Latest</a></li>
+        <li ng-class='{navActive: isActive("players")}'><a ui-sref='players.list'>Players</a></li>
+        <li ng-class='{navActive: isActive("maps")}'><a ui-sref='maps.list'>Maps</a></li>
+        <!-- Jumpstats dropdown -->
+        <li class='noHover' ng-class='{navbar__menu__dropdown: toggled}'>
+          <a href='' ng-click='toggled = !toggled'>Jumpstats
+            <span class='navbar__menu__dropdown__arrow' ng-show='toggled'>&#9650;</span>
+            <span class='navbar__menu__dropdown__arrow' ng-show='!toggled'>&#9660;</span>
+          </a>
+          <ul class='navbar__menu__dropdown__list' ng-show='toggled'>
+            <li><a ui-sref='jumps.detail({jumpName: "lj"})'>Longjump</a></li>
+            <li><a ui-sref='jumps.detail({jumpName: "bhop"})'>Bunnyhop</a></li>
+            <li><a ui-sref='jumps.detail({jumpName: "dropbhop"})'>Dropbhop</a></li>
+            <li><a ui-sref='jumps.detail({jumpName: "mbhop"})'>Multibhop</a></li>
+            <li><a ui-sref='jumps.detail({jumpName: "wj"})'>Weirdjump</a></li>
+            <li><a ui-sref='jumps.detail({jumpName: "ladderjump"})'>Ladderjump</a></li>
+            <li><a ui-sref='jumps.detail({jumpName: "cj"})'>Countjump</a></li>
+          </ul>
+        </li>
+      </ul>
+      <!-- Search -->
+      <div class='navbar__search'>
+        <form class='form-inline' ng-submit='search()'>
+          <div class='input-group'>
+            <input type='text' class='form-control' ng-model='searchField' placeholder='Map or player' minlength='2' maxlength='20' autofocus>
+            <div class='input-group-addon' ng-click='search()'>
+              <span class='glyphicon glyphicon-search'></span>
+            </div>
+            <!-- Hidden submit button to allow submitting by enter keypress -->
+            <input type='submit' style='position: absolute; left: -9999px; width: 1px; height: 1px;'>
+          </div>
+        </form>
+      </div>
+      <!-- Footer -->
+      <div class='navbar__footer'>
+        Stats provided by<br>
+        <a href='http://www.kzstats.com/local/'>KZStats Local</a>
+      </div>
+    </nav>
+    <!-- Main content -->
+    <div class='content'>
+      <div ng-hide='loading' ui-view></div>
+      <div ng-show='loading'>Loading...</div>
+    </div>
+    <script src='js/bundle.js'></script>
+  </body>
+</html>
